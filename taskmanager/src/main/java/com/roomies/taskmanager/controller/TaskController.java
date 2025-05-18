@@ -15,7 +15,8 @@ public class TaskController {
 
     @PostMapping("/create")
     public Task createTask(@RequestBody Task task,
-                           @RequestParam Long roomId) {
-        return taskService.createTask(task, roomId);
+                        @RequestParam Long assigneeId) {
+        return taskService.createTaskAndAssign(task, assigneeId);
     }
+
 }

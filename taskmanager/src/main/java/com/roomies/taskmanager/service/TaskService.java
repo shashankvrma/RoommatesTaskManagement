@@ -19,13 +19,29 @@ public class TaskService {
     private TaskAssignmentRepository taskAssignmentRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private RoomRepository roomRepository;
 
-    public Task createTask(Task task, Long roomId) {
+    public Task createTaskAndAssign(Task task, Long assigneeId) {
         Task savedTask = taskRepository.save(task);
-        assignTaskToNextUser(savedTask, roomId);
+    
+        User assignee = userRepository.findById(assigneeId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        TaskAssignment assignment = TaskAssignment.builder()
+                .task(savedTask)
+                .assignee(assignee)
+                .assignedDate(LocalDate.now())
+                .completed(false)
+                .build();
+    
+        taskAssignmentRepository.save(assignment);
+    
         return savedTask;
     }
+    
 
     public void assignTaskToNextUser(Task task, Long roomId) {
         Optional<Room> roomOpt = roomRepository.findById(roomId);
