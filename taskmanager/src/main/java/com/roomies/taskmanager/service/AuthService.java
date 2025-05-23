@@ -5,8 +5,15 @@ import com.roomies.taskmanager.dto.SignupRequest;
 import com.roomies.taskmanager.model.User;
 import com.roomies.taskmanager.repository.UserRepository;
 import com.roomies.taskmanager.security.JwtUtil;
+import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import javax.crypto.SecretKey;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +25,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -49,7 +59,13 @@ public class AuthService {
         }
 
         // ✅ Generate token here
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = Jwts.builder()
+        .setSubject(user.getEmail())
+        .claim("id", user.getId())
+        .claim("role", user.getRole().name())
+        .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
+        .compact();
+    
         return token; // return the token
     }
 

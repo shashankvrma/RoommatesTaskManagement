@@ -1,5 +1,7 @@
 package com.roomies.taskmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,5 +30,21 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
+
+    @ManyToOne
+    @JoinColumn(name = "apartment_id") 
+    @JsonIgnoreProperties("users")     
+    private Apartment apartment;
+
+    @Override
+    public String toString() {
+        return "User{id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", apartment=" + (apartment != null ? apartment.getId() : "null") +
+                '}';
+    }
+
 
 }
